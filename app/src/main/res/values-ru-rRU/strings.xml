@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Мои фильмы</string>
+    <string name="film_poster">Постер к фильму</string>
+    <string name="most_popular">Самые популярные</string>
+    <string name="top_rated">Наиболее рейтинговые</string>
+    <string name="item_favorite">Избраннное</string>
+    <string name="item_main">Главная</string>
+    <string name="play_trailer_button">Посмотреть трейлер</string>
+</resources>
