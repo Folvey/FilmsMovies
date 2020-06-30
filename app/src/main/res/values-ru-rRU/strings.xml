@@ -7,4 +7,8 @@
     <string name="item_favorite">Избраннное</string>
     <string name="item_main">Главная</string>
     <string name="play_trailer_button">Посмотреть трейлер</string>
+    <string name="label_title">Название</string>
+    <string name="original_title">Оригинальное название</string>
+    <string name="description">Описание</string>
+
 </resources>

@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">My Movies</string>
     <string name="film_poster">Poster to film</string>
-    <string name="most_popular">Самые популярные</string>
-    <string name="top_rated">Наиболее рейтинговые</string>
-    <string name="item_favorite">Избраннное</string>
-    <string name="item_main">Главная</string>
-    <string name="play_trailer_button">play trailer button</string>
+    <string name="most_popular">Most popular</string>
+    <string name="top_rated">Top rated</string>
+    <string name="item_favorite">Favorite</string>
+    <string name="item_main">Main</string>
+    <string name="play_trailer_button">Play trailer button</string>
+    <string name="label_title">Title</string>
+    <string name="original_title">Original title</string>
+    <string name="description">Description</string>
+
 </resources>

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -41,11 +42,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private RecyclerView recyclerViewPosters;
     private MovieAdapter movieAdapter;
+    private MainViewModel viewModel;
+
     private Switch switchSort;
     private TextView textViewTopRated;
     private TextView textViewPopularity;
     private ProgressBar progressBarLoading;
-    private MainViewModel viewModel;
 
     private static final int LOADER_ID = 73;
     private LoaderManager loaderManager;
@@ -57,17 +59,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.hide();
-//        }
+
+        init();
         loaderManager = LoaderManager.getInstance(this);
-        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
-        switchSort = findViewById(R.id.switchSort);
-        textViewTopRated = findViewById(R.id.textViewRating);
-        textViewPopularity = findViewById(R.id.textViewPopularity);
-        recyclerViewPosters = findViewById(R.id.recyclerViewPosters);
-        progressBarLoading = findViewById(R.id.progressBarLoading);
+
+
+//        recyclerViewPosters.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewPosters.setLayoutManager(new GridLayoutManager(this, getColumnCount()));
         movieAdapter = new MovieAdapter();
         recyclerViewPosters.setAdapter(movieAdapter);
@@ -107,6 +104,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
     }
 
+    private void init() {
+        switchSort = findViewById(R.id.switchSort);
+        textViewTopRated = findViewById(R.id.textViewRating);
+        textViewPopularity = findViewById(R.id.textViewPopularity);
+        recyclerViewPosters = findViewById(R.id.recyclerViewPosters);
+        progressBarLoading = findViewById(R.id.progressBarLoading);
+
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
+    }
+
     private int getColumnCount() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -131,12 +138,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void setMethodOfSort(boolean isTopRated) {
         if (isTopRated) {
-            textViewTopRated.setTextColor(getResources().getColor(R.color.colorAccent));
-            textViewPopularity.setTextColor(getResources().getColor(R.color.white_color));
+            textViewTopRated.setTextColor(getResources().getColor(R.color.colorGreen));
+            textViewPopularity.setTextColor(getResources().getColor(R.color.colorBlack));
             methodOfSort = NetworkUtils.RATING;
         } else {
-            textViewPopularity.setTextColor(getResources().getColor(R.color.colorAccent));
-            textViewTopRated.setTextColor(getResources().getColor(R.color.white_color));
+            textViewPopularity.setTextColor(getResources().getColor(R.color.colorGreen));
+            textViewTopRated.setTextColor(getResources().getColor(R.color.colorBlack));
             methodOfSort = NetworkUtils.POPULARITY;
         }
         downloadData(methodOfSort, page);
