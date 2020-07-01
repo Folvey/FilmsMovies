@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,33 +59,11 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        imageViewBigPoster = findViewById(R.id.imageViewBigPoster);
-        textViewTitle = findViewById(R.id.textViewTitle);
-        textViewOriginalTitle = findViewById(R.id.textViewOriginalTitle);
-        textViewRating = findViewById(R.id.textViewRating);
-        textViewReleaseDate = findViewById(R.id.textViewReleaseDate);
-        textViewOverview = findViewById(R.id.textViewOverview);
-        imageViewFavorite = findViewById(R.id.imageViewAddToFavorite);
-        scrollViewInfo = findViewById(R.id.scrollViewInfo);
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("id")) {
-            id = intent.getIntExtra("id", 0);
-        } else
-            finish();
-        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
-        movie = viewModel.getMovieById(id);
-        Picasso.get().load(movie.getBigPosterPath()).into(imageViewBigPoster);
-        setStarColor();
-        textViewTitle.setText(movie.getTitle());
-        textViewOriginalTitle.setText(movie.getOriginalTitle());
-        textViewReleaseDate.setText(movie.getReleaseDate());
-        textViewRating.setText(Double.toString(movie.getVoteAverage()));
-        textViewOverview.setText(movie.getOverView());
-
-        recyclerViewReviews = findViewById(R.id.recyclerViewReviews);
-        recyclerViewTrailers = findViewById(R.id.recyclerViewTrailers);
-        reviewAdapter = new ReviewAdapter();
-        trailerAdapter = new TrailerAdapter();
+        init();
+        getMovie();
+        setInfo();
+        setRecyclerViews();
+        scrollViewInfo.smoothScrollTo(0, 0);
         trailerAdapter.setOnTrailerClickListener(new TrailerAdapter.OnTrailerClickListener() {
             @Override
             public void onTrailerClick(String url) {
@@ -93,37 +72,6 @@ public class DetailActivity extends AppCompatActivity {
                 startActivity(intentToTrailer);
             }
         });
-        recyclerViewReviews.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewTrailers.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewReviews.setAdapter(reviewAdapter);
-        recyclerViewTrailers.setAdapter(trailerAdapter);
-        JSONObject jsonObjectTrailers = NetworkUtils.getJSONForVideos(movie.getId());
-        JSONObject jsonObjectReviews = NetworkUtils.getJSONForReviews(movie.getId());
-        ArrayList<Review> reviews = JSONUtils.getReviewsFromJSON(jsonObjectReviews);
-        ArrayList<Trailer> trailers = JSONUtils.getTrailerFromJSON(jsonObjectTrailers);
-        reviewAdapter.setReviews(reviews);
-        trailerAdapter.setTrailers(trailers);
-        scrollViewInfo.smoothScrollTo(0, 0);
-    }
-
-    public void onClickChangeFavorite(View view) {
-        if (favoriteMovie == null) {
-            viewModel.insertFavoriteMovie(new FavoriteMovie(movie));
-            Toast.makeText(this, "Добавлено в избранное", Toast.LENGTH_SHORT).show();
-        } else {
-            viewModel.deleteFavoriteMovie(new FavoriteMovie(movie));
-            Toast.makeText(this, "Убрано из избранного", Toast.LENGTH_SHORT).show();
-        }
-        setStarColor();
-    }
-
-    private void setStarColor() {
-        favoriteMovie = viewModel.getFavoriteMovieById(id);
-        if (favoriteMovie == null) {
-            imageViewFavorite.setImageResource(R.drawable.favourite_add_to);
-        } else {
-            imageViewFavorite.setImageResource(R.drawable.favourite_remove);
-        }
     }
 
     @Override
@@ -147,5 +95,76 @@ public class DetailActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    private void init() {
+        imageViewBigPoster = findViewById(R.id.imageViewBigPoster);
+        textViewTitle = findViewById(R.id.textViewTitle);
+        textViewOriginalTitle = findViewById(R.id.textViewOriginalTitle);
+        textViewRating = findViewById(R.id.textViewRating);
+        textViewReleaseDate = findViewById(R.id.textViewReleaseDate);
+        textViewOverview = findViewById(R.id.textViewOverview);
+        imageViewFavorite = findViewById(R.id.imageViewAddToFavorite);
+        scrollViewInfo = findViewById(R.id.scrollViewInfo);
+        recyclerViewReviews = findViewById(R.id.recyclerViewReviews);
+        recyclerViewTrailers = findViewById(R.id.recyclerViewTrailers);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
+    }
+
+    private void getMovie() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("id")) {
+            id = intent.getIntExtra("id", 0);
+        } else
+            finish();
+        if (intent.hasExtra("favorite"))
+            movie = viewModel.getFavoriteMovieById(id);
+        else
+            movie = viewModel.getMovieById(id);
+    }
+
+    private void setRecyclerViews() {
+        reviewAdapter = new ReviewAdapter();
+        trailerAdapter = new TrailerAdapter();
+        recyclerViewReviews.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewTrailers.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewReviews.setAdapter(reviewAdapter);
+        recyclerViewTrailers.setAdapter(trailerAdapter);
+        JSONObject jsonObjectTrailers = NetworkUtils.getJSONForVideos(movie.getId());
+        JSONObject jsonObjectReviews = NetworkUtils.getJSONForReviews(movie.getId());
+        ArrayList<Review> reviews = JSONUtils.getReviewsFromJSON(jsonObjectReviews);
+        ArrayList<Trailer> trailers = JSONUtils.getTrailerFromJSON(jsonObjectTrailers);
+        reviewAdapter.setReviews(reviews);
+        trailerAdapter.setTrailers(trailers);
+    }
+
+    private void setInfo() {
+        Picasso.get().load(movie.getBigPosterPath()).into(imageViewBigPoster);
+        setStarColor();
+        textViewTitle.setText(movie.getTitle());
+        textViewOriginalTitle.setText(movie.getOriginalTitle());
+        textViewReleaseDate.setText(movie.getReleaseDate());
+        textViewRating.setText(Double.toString(movie.getVoteAverage()));
+        textViewOverview.setText(movie.getOverView());
+    }
+
+    public void onClickChangeFavorite(View view) {
+        if (favoriteMovie == null) {
+            viewModel.insertFavoriteMovie(new FavoriteMovie(movie));
+            Toast.makeText(this, "Добавлено в избранное", Toast.LENGTH_SHORT).show();
+        } else {
+            viewModel.deleteFavoriteMovie(new FavoriteMovie(movie));
+            Toast.makeText(this, "Убрано из избранного", Toast.LENGTH_SHORT).show();
+        }
+        setStarColor();
+    }
+
+    private void setStarColor() {
+        favoriteMovie = viewModel.getFavoriteMovieById(id);
+        if (favoriteMovie == null) {
+            imageViewFavorite.setImageResource(R.drawable.favourite_add_to);
+        } else {
+            imageViewFavorite.setImageResource(R.drawable.favourite_remove);
+        }
     }
 }
