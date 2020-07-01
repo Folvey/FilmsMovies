@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.mymovies.adapters.MovieAdapter;
 import com.example.mymovies.data.MainViewModel;
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static int page = 1;
     private static int methodOfSort;
     private static boolean isLoading = false;
-    private final String TAG = "Debug MainActivity";
+    private static final String TAG = "Debug MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +62,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         init();
         loaderManager = LoaderManager.getInstance(this);
-
-
-//        recyclerViewPosters.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewPosters.setLayoutManager(new GridLayoutManager(this, getColumnCount()));
         movieAdapter = new MovieAdapter();
         recyclerViewPosters.setAdapter(movieAdapter);
-        switchSort.setChecked(true);
+
+        setMethodOfSort(false);
         switchSort.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setMethodOfSort(isChecked);
                 page = 1;
+                setMethodOfSort(isChecked);
             }
         });
-        switchSort.setChecked(false);
         movieAdapter.setOnPosterClickListener(new MovieAdapter.OnPosterClickListener() {
             @Override
             public void onPosterClick(int position) {
@@ -116,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
     }
 
+
     private int getColumnCount() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -141,13 +137,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void setMethodOfSort(boolean isTopRated) {
         if (isTopRated) {
-            textViewTopRated.setTextColor(getResources().getColor(R.color.colorGreen));
+            textViewTopRated.setTextColor(getResources().getColor(R.color.colorPrimary));
             textViewPopularity.setTextColor(getResources().getColor(R.color.colorBlack));
             methodOfSort = NetworkUtils.RATING;
         } else {
-            textViewPopularity.setTextColor(getResources().getColor(R.color.colorGreen));
+            textViewPopularity.setTextColor(getResources().getColor(R.color.colorPrimary));
             textViewTopRated.setTextColor(getResources().getColor(R.color.colorBlack));
             methodOfSort = NetworkUtils.POPULARITY;
+
         }
         downloadData(methodOfSort, page);
     }
