@@ -33,17 +33,14 @@ public class FavoriteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.hide();
-//        }
+
         rvFavoriteMovies = findViewById(R.id.rvFavoriteMovies);
         adapter = new MovieAdapter();
         viewModel = new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainViewModel.class);
         rvFavoriteMovies.setLayoutManager(new GridLayoutManager(this, 2));
         rvFavoriteMovies.setAdapter(adapter);
+
         LiveData<List<FavoriteMovie>> favoriteMovies = viewModel.getFavoriteMovies();
-        List<FavoriteMovie> movies = new ArrayList<>();
         favoriteMovies.observe(this, new Observer<List<FavoriteMovie>>() {
             @Override
             public void onChanged(List<FavoriteMovie> favoriteMovies) {

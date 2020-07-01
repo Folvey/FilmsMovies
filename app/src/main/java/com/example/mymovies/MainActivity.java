@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +41,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<JSONObject> {
 
+    private LoaderManager loaderManager;
     private RecyclerView recyclerViewPosters;
     private MovieAdapter movieAdapter;
     private MainViewModel viewModel;
@@ -50,10 +52,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ProgressBar progressBarLoading;
 
     private static final int LOADER_ID = 73;
-    private LoaderManager loaderManager;
     private static int page = 1;
     private static int methodOfSort;
     private static boolean isLoading = false;
+    private final String TAG = "Debug MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int width = (int) (displayMetrics.widthPixels / displayMetrics.density);
         return width / 185 > 2 ? width / 185 : 2;
     }
+
     private void downloadData(int methodOfSort, int page) {
         URL url = NetworkUtils.buildURL(methodOfSort, page);
         Bundle bundle = new Bundle();
@@ -188,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<JSONObject> loader, JSONObject data) {
+        Log.d(TAG, "onLoadFinished: " + methodOfSort + " " + page);
         ArrayList<Movie> movies = JSONUtils.getMoviesFromJSON(data);
         if (!movies.isEmpty()) {
             if (page == 1) {
